@@ -43,7 +43,39 @@ function [rho,timecell,fcell,dS]=SSP(mu,g,J,dT,rate,fmin,fmax,twait,resstep,extr
     plottitle=['JCH bistability: J=' num2str(J) '  \mu=' num2str(mu) 'g=' num2str(g) '\epsilon=\omega - J'];
     if length(vplot)==3
         %more plot option can be added later like in SaveandPlot
-        parforplot_a2f2color(rho,timecell,fcell,dS,sig,plottitle,saveplot,savenameplot);
+        if vplot(1)
+            parforplot_a2f2color(rho,timecell,fcell,dS,sig,plottitle,saveplot,savenameplot);
+        end
+        if vplot(2)
+        %calculate expectation values
+        v_n_inc=expectation_val(length(timecell{1}),rho{1},sig{1,3});
+        v_n_wait=expectation_val(length(timecell{2}),rho{2},sig{1,3});
+        v_n_dec=expectation_val(length(timecell{3}),rho{3},sig{1,3});
+        %make plot
+        fig=figure;
+        subplot(3,1,1)
+        plot(timecell{1},fcell{1}.^2,'color',[0.6350, 0.0780, 0.1840],'LineWidth',1.2)  %color dark red
+        hold on
+        plot(timecell{2},fcell{2}.^2,'color',[0.4660, 0.6740, 0.1880],'LineWidth',1.2)  %color green
+        hold on
+        plot(timecell{3},fcell{3}.^2,'color',[0, 0.4470, 0.7410],'LineWidth',1.2)       %color blue
+        xlabel('t');ylabel('f^2');
+        subplot(3,1,2)
+        plot(timecell{1},v_n_inc.^2,'color',[0.6350, 0.0780, 0.1840],'LineWidth',1.2)  %color dark red
+        hold on
+        plot(timecell{2},v_n_wait.^2,'color',[0.4660, 0.6740, 0.1880],'LineWidth',1.2) %color green
+        hold on
+        plot(timecell{3},v_n_dec.^2,'color',[0, 0.4470, 0.7410],'LineWidth',1.2)       %color blue
+        xlabel('time(s)');ylabel('|<a*a>|');%title('<a>');
+        subplot(3,1,3)
+        plot(fcell{1}.^2,v_n_inc.^2,'color',[0.6350, 0.0780, 0.1840],'LineWidth',1.2)  %color dark red
+        hold on
+        plot(fcell{2}.^2,v_n_wait.^2,'color',[0.4660, 0.6740, 0.1880],'LineWidth',1.2) %color green
+        hold on
+        plot(fcell{3}.^2,v_n_dec.^2,'color',[0, 0.4470, 0.7410],'LineWidth',1.2)       %color blue
+        xlabel('f^2');ylabel('|<a*a>|');%title('<a>');
+        sgtitle(plottitle)
+        end
     else
 %         disp(class(timecell))
 %         disp(class(rho))
