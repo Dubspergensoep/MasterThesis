@@ -22,24 +22,22 @@ Nc=Nxc*Nyc;             %number of sites in cluster
 s_WF=2*(N_max+1);       %size wave function
 sig = GetAllOperatorsSparse(Nc,N_max);
 % Laser parameters
-fmax=0.1;
+fmax=0.15;
 rate1=1e-5;
 rate2=1e-5;
 twait=1000;
 t_fmax=fmax/rate1;
 f=@(t) laser(t,rate1,t_fmax,twait,rate2)
 t_end=t_fmax+twait+fmax/rate2;
-dT=50;
+dT=10;
 
 %% Calculate cluster
-%t_end=50;
-%parpool(4)
+parpool(4)
 tic
-for j=1:1 %Since there are 28 notes we will use all of them
+parfor j=1:28 %Since there are 28 notes we will use all of them
     [time, Ct]=CalculateTrajectory(gamma, Kappa, J,f,omega,epsilon,g,mu,Nxc,Nyc,Nx,Ny,t_end,dT,fill,5,spin);
     %Calculate |<a>|
     v_ea=[];
-%     for n=1:dT:t_end
     for n=1:length(time)
         ea=0;                                               %expectation value a
         for i = 1:n_sites
@@ -48,14 +46,10 @@ for j=1:1 %Since there are 28 notes we will use all of them
         end
         v_ea(n)=abs(ea)/n_sites;
     end
-    fname=strjoin(["syms_quick_" num2str(j)],'');
+    fname=strjoin(["sysm/syms_" num2str(j)],'');
     parsave(fname,v_ea,time,Ct)
 end
 toc
-%%
-
-
-
 
 %% functions
 function parsave(fname, v_ea,time,Ct)
