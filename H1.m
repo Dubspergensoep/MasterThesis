@@ -1,4 +1,4 @@
-function OA = H1(gamma, Kappa, J, f, w, eps, g, mu, z, Nxc, Nyc, Nx, Ny, sig )
+function OA = H1(gamma, Kappa, J, f, w, epsilon, g, mu, z, Nxc, Nyc, Nx, Ny, sig )
 %-------------------------------------------------------------------------%
 %   Calculate the first part of the Hamiltonian, the time independent part,
 %   reducing it to single operators (matrices) of each cluster acting on 
@@ -6,11 +6,9 @@ function OA = H1(gamma, Kappa, J, f, w, eps, g, mu, z, Nxc, Nyc, Nx, Ny, sig )
 %Parameters:
 %   gamma           system parameter
 %   J               hopping amplitude
-%   D               detuning
-%   U               Kerr nonlinearity
-%   f               pumping strength
+%   f               pumping strength (This is moved to H2)
 %   w               energy bosonic mode
-%   eps             transition energy 2 level system
+%   epsilon         transition energy 2 level system
 %   g               coupling photon and 2 level system
 %   mu              chemical potential
 %   z               number of neighbours
@@ -44,19 +42,18 @@ function OA = H1(gamma, Kappa, J, f, w, eps, g, mu, z, Nxc, Nyc, Nx, Ny, sig )
 
             %Bijdrage van (-1i) komt van de schrodinger vergelijking.
             A = A + (-1i)*((w - mu)*sig{i_clust, 3} ...
-                + 0.5*(eps-mu)*sig{i_clust,4} ...
+                + 0.5*(epsilon-mu)*sig{i_clust,4} ...
                 + g*(sig{i_clust,2}*sig{i_clust,5} + sig{i_clust,1}*sig{i_clust,6})); % Jaynes-Cummings part
-            %A = A + (-1i)*f*(sig{i_clust,1}+sig{i_clust,2});                               % Term corresponding to photon pumping
+            %A = A + (-1i)*f*(sig{i_clust,1}+sig{i_clust,2});                         % Term corresponding to photon pumping
             
-            n_in = nonzeros(in(i_site,:));                                      %neighbours of i_site in cluster. !in lattice picture!
-                                                                                %momenteel is alles hier nul want we werken zonder clusters
+            n_in = nonzeros(in(i_site,:));      %neighbours of i_site in cluster. !in lattice picture!
+
             for j = 1:length(n_in)
                 ind = SiteI(n_in(j));                                           %Cluster index of the site n_in(j);
                 
                 %Hopping contribution inside cluster:
                 A = A + (1i)*(J/z)*(sig{i_clust,1}*sig{ind, 2});
-                
-
+               
             end
         end
         OA{cluster} = sparse(A);

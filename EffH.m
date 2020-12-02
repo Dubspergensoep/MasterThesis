@@ -1,12 +1,10 @@
-function [time, Ct, tj, Cj, ij] = EffH( gamma, J, f, z, Nxc, Nyc, Nx, Ny, clustconfig, NNM, sig, A1, Cin, T, Tspan, eps, ct )
+function [time, Ct, tj, Cj, ij] = EffH( J, f, z, Nxc, Nyc, Nx, Ny, clustconfig, NNM, sig, A1, Cin, T, Tspan, eps, ct )
 %-------------------------------------------------------------------------%
 %Function EffH 
 %   Calculates the time evolution of the wave function.
 %Parameters:
 %   gamma           system parameter
 %   J               hopping amplitude
-%   D               detuning
-%   U               Kerr nonlinearity
 %   f               pumping strength
 %   z               number of neighbours
 %   Nxc             number of sites in x direction of cluster
@@ -29,5 +27,5 @@ function [time, Ct, tj, Cj, ij] = EffH( gamma, J, f, z, Nxc, Nyc, Nx, Ny, clustc
 %   ct              current time, this is need for f(t)
 %-------------------------------------------------------------------------%
 options = odeset('events', @(t,C) myEvent(t, C, eps, T));
-[time, Ct, tj, Cj, ij] = ode45(@(t, C) odeC(t, C, gamma, J, f, z, Nxc, Nyc, Nx, Ny, clustconfig, NNM, sig, A1, ct), Tspan, Cin, options);
+[time, Ct, tj, Cj, ij] = ode45(@(t, C) odeC(t, C, J, f, z, Nxc, Nyc, Nx, Ny, clustconfig, NNM, sig, A1, ct), Tspan, Cin, options);
 end

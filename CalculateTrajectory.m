@@ -21,8 +21,6 @@ function [ time, Ct] = CalculateTrajectory(gamma, Kappa, J, f, w, epsilon, g, mu
     else
         z = 2;                    %1d number of neirest neighbours
     end
-    %
-    D=1;U=1;            %parameters zijn niet meer nodig maar staan nog overal
     %Some system parameters and operators:
     N = Nx*Ny;                                                                                          %number of sites in lattice
     Nc = Nxc*Nyc;                                                                                       %number of sites in cluster
@@ -57,7 +55,7 @@ function [ time, Ct] = CalculateTrajectory(gamma, Kappa, J, f, w, epsilon, g, mu
         e1 = rand;                                                                                      %Random variable to determine jump time.
         ct=i*dt;                                                                                        %Current time needed for f(t)
         while check
-            [t_s, Cin, ~, ~, ~] = EffH(gamma, J, f, z, Nxc, Nyc, Nx, Ny,...
+            [t_s, Cin, ~, ~, ~] = EffH(J, f, z, Nxc, Nyc, Nx, Ny,...
                 clustconfig, NNM, sig, A1, Cin, Tnorm, [0 t_left], e1,ct);                              %Time evolution up untill t_left or untill the jump time t_j.
             if t_s(end) == t_left                                                                       %NO JUMP in the chosen time interval.
                 Cin = transpose(Cin(end,:))./NormC(transpose(Cin(end,:)), NC);                          %Normalize wave function

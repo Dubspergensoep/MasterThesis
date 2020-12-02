@@ -29,8 +29,8 @@ function OA = H2( J, f, z, clustconfig, NNM, sig, SigExp )
 %         OA{i} = zeros(n_coeff,n_coeff);
     end
     
-    eap = NNM*SigExp(:,1);                                                %eap(i)= sum^NN_j (<a_j^+>) -> part of mean-field contribution
-    eam = NNM*SigExp(:,2);                                                %eam(i)= sum^NN_j (<a_j>) -> part of mean-field contribution
+    eap = NNM*SigExp(:,1);       %eap(i)= sum^NN_j (<a_j^+>) -> part of mean-field contribution
+    eam = NNM*SigExp(:,2);       %eam(i)= sum^NN_j (<a_j>)   -> part of mean-field contribution
 
     for cluster=1:n_clust
         for i_clust = 1:n_sc                                                %index of the site inside the cluster.

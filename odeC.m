@@ -1,4 +1,4 @@
-function dC = odeC(t, C, gamma, J, f, z, Nxc, Nyc, Nx, Ny, clustconfig, NNM, sig, A1, ct)
+function dC = odeC(t, C, J, f, z, Nxc, Nyc, Nx, Ny, clustconfig, NNM, sig, A1, ct)
 %-------------------------------------------------------------------------%
 %   system of differential equations for the coefficients of the individual
 %   site wave functions.
@@ -7,8 +7,6 @@ function dC = odeC(t, C, gamma, J, f, z, Nxc, Nyc, Nx, Ny, clustconfig, NNM, sig
 %   C               coefficient value the ODE will calculate (column vector).
 %   gamma           system parameter
 %   J               hopping amplitude
-%   D               detuning
-%   U               Kerr nonlinearity
 %   f               pumping strength
 %   z               number of neighbours
 %   Nxc             number of sites in x direction of cluster
@@ -48,7 +46,6 @@ function dC = odeC(t, C, gamma, J, f, z, Nxc, Nyc, Nx, Ny, clustconfig, NNM, sig
         if (Nxc == Nx) && (Nyc == Ny)
             dC(range) = A1{j}*C(range);
         else
-%             dC(range) = (1/gamma)*(A1{j}+A2{j})*C(range); %!!!!!klopt 1/gamma wel? !!!!!!!
             dC(range) = (A1{j}+A2{j})*C(range);
         end
     end

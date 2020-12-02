@@ -22,7 +22,7 @@ Nc=Nxc*Nyc;             %number of sites in cluster
 s_WF=2*(N_max+1);       %size wave function
 sig = GetAllOperatorsSparse(Nc,N_max);
 % Laser parameters
-fmax=0.15;
+fmax=0.13;
 rate1=1e-5;
 rate2=1e-5;
 twait=1000;
