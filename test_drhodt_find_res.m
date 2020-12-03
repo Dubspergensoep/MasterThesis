@@ -112,10 +112,10 @@ vplot=[];
 %% |<a*a>| plot 
 mu=0.75;
 g=0.5;
-fmax=0.5;
+fmax=0.15;
 savelocation='syms';
-vplot=[];
-[rho,timecell,fcell,dS]=SSP(mu,g,J,dT,rate,fmin,fmax,twait,resstep,extra_steps,method,vplot,savelocation,true,savelocation)
+vplot=[0 1 0];
+[rho,timecell,fcell,dS]=SSP(mu,g,J,dT,rate,fmin,fmax,twait,resstep,extra_steps,method,vplot,savelocation,true,savelocation,'',false)
 %%
 rho_full=[rho{1} rho{2} rho{3}];
 time_full=[timecell{1} timecell{2} timecell{3}];

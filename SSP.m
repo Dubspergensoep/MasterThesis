@@ -1,4 +1,4 @@
-function [rho,timecell,fcell,dS]=SSP(mu,g,J,dT,rate,fmin,fmax,twait,resstep,extra_steps,method,vplot,saveloc,saveplot,savelocplots)
+function [rho,timecell,fcell,dS]=SSP(mu,g,J,dT,rate,fmin,fmax,twait,resstep,extra_steps,method,vplot,saveloc,saveplot,savelocplots,odemethod,dispt)
     %Solve Save and Plot
     gamma=0.005;
     Kappa=0.005;
@@ -27,13 +27,23 @@ function [rho,timecell,fcell,dS]=SSP(mu,g,J,dT,rate,fmin,fmax,twait,resstep,extr
         num2str(rate) '_twait' num2str(twait) '_' num2str(dT) '_resstep' num2str(resstep) ...
         '_extra_steps' num2str(extra_steps) '_method' method.str ...
         '_' num2str(method.threshold) '_' num2str(method.abs_threshold) '.mat'];
+    %%
+    dS=zeros(1,2);  %dS(1) = surface in <n(f)> plot
+                    %dS(2) = surface in <a(f)> plot
     %% Solve ODE
     if isfile(filename)
         load(filename)
     else
-        [rho,timecell,fcell,dS]=find_bistab(H1,sig,J,gamma,Kappa,Rho_0,dT,rate,fmin,fmax,twait,resstep,extra_steps,method);
+        [rho,timecell,fcell,dS(2)]=find_bistab(H1,sig,J,gamma,Kappa,Rho_0,dT,rate,fmin,fmax,twait,resstep,extra_steps,method,true,odemethod,dispt);
         save(filename,'rho','timecell','fcell','dS');
     end
+    %% Calculate dSn
+    % CALCULATE BISTAB SURFACE dS
+    v_n_inc=expectation_val(length(timecell{1}),rho{1},sig{1,3});
+    v_n_dec=expectation_val(length(timecell{3}),rho{3},sig{1,3});
+    flip_fdec=flip(fcell{3});
+    flip_vndec=flip(v_n_dec);
+    dS(1)=trapz(flip_fdec.^2,flip_vndec.^2)-trapz(fcell{1}.^2,v_n_inc.^2);
     %% Plots
     savenameplot=[savelocplots 'SSP_plot_mu' num2str(mu) '_g' num2str(g) '_J' num2str(J)...
         '_fmin' num2str(fmin) '_fmax'  num2str(fmax) '_rate' ...

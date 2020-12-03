@@ -1,4 +1,4 @@
-function [rho_lt,time]=Solve_drhodt(H1,sig,J,f,gamma,Kappa,Rho_0,dT,t_end)
+function [rho_lt,time]=Solve_drhodt(H1,sig,J,f,gamma,Kappa,Rho_0,dT,t_end,odemethod)
     s_WF=length(Rho_0);
     %construct time vec
     t_e=ceil(t_end/dT)*dT; %make sure t_end is dividble by dT
@@ -15,7 +15,11 @@ function [rho_lt,time]=Solve_drhodt(H1,sig,J,f,gamma,Kappa,Rho_0,dT,t_end)
         %construct time window
         tspan=[time(t) time(t+1)];
         %solve DV
-        sol = ode15s(@(t,y) odefun_DM_MF(t, y,H1,sig,J, f, gamma, Kappa), tspan, Rho_l_0);
+        if strcmp(odemethod,'ode45')
+            sol = ode45(@(t,y) odefun_DM_MF(t, y,H1,sig,J, f, gamma, Kappa), tspan, Rho_l_0);
+        else
+            sol = ode15s(@(t,y) odefun_DM_MF(t, y,H1,sig,J, f, gamma, Kappa), tspan, Rho_l_0);
+        end
         %Updata Rho_l_0
         Rho_l_0=sol.y(:,end);
         %Save results

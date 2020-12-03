@@ -1,4 +1,10 @@
-function [rho,time,v_f,dS]=find_bistab(H1,sig,J,gamma,Kappa,Rho_0,dT,rate,fmin,fmax,twait,resstep,extra_steps,method)
+function [rho,time,v_f,dS]=find_bistab(H1,sig,J,gamma,Kappa,Rho_0,dT,rate,fmin,fmax,twait,resstep,extra_steps,method,cnr,odemethod,dispt)
+    %cnr                 - continue with not resonance (boolean)
+    %                      if true f will be lowered regrardless of a
+    %                      resonane
+    %odemethod           - allow user to choose between ode45 and
+    %                      ode15s(default)
+    %dispt               - display time step (boolean)
     %Function will look for a resonance while increasing f.
     %when the resonance is found the system will be able to relax.
     %After this relaxation f will be decreased again.
@@ -10,13 +16,14 @@ function [rho,time,v_f,dS]=find_bistab(H1,sig,J,gamma,Kappa,Rho_0,dT,rate,fmin,f
     s_WF=length(Rho_0);
     %resstep=ceil(resstep/dT)*dT;
     %% increase f
+    disp('Start increase')
     t_fmax=fmax/rate;
     t_fM=ceil(t_fmax/dT)*dT; %make sure t_end is dividble by dT (Solve_drhodt also does this)
     %construct time vec
     t_fmin=fmin/rate;
     t_fm=ceil(t_fmin/dT)*dT; %make sure t_end is dividble by dT (Solve_drhodt also does this)
     f=@(t) laser(t,rate,t_fM+dT*extra_steps,0,0);    %This could be done simpler
-    [rho_inc,time_inc]=Solve_drhodt(H1,sig,J,f,gamma,Kappa,Rho_0,dT,t_fm);
+    [rho_inc,time_inc]=Solve_drhodt(H1,sig,J,f,gamma,Kappa,Rho_0,dT,t_fm,odemethod);
     
     % Looking for resonance
     %while loop parameters
@@ -35,7 +42,7 @@ function [rho,time,v_f,dS]=find_bistab(H1,sig,J,gamma,Kappa,Rho_0,dT,rate,fmin,f
         % CALCULATE NEXT SEGMENT
         f_temp=@(t) f(tc+t);
         Rho_0=reshape(rho_inc(:,end), s_WF, s_WF);
-        [rho_temp,time_temp]=Solve_drhodt(H1,sig,J,f_temp,gamma,Kappa,Rho_0,dT,dT*resstep);
+        [rho_temp,time_temp]=Solve_drhodt(H1,sig,J,f_temp,gamma,Kappa,Rho_0,dT,dT*resstep,odemethod);
         rho_inc=[rho_inc rho_temp];
         time_inc=[time_inc time_inc(end)+time_temp];
         % UPDATE tc
@@ -43,22 +50,30 @@ function [rho,time,v_f,dS]=find_bistab(H1,sig,J,gamma,Kappa,Rho_0,dT,rate,fmin,f
         if tc+dT*resstep > t_fM
             disp('fmax was reached')
         end
+        if dispt
+            disp(tc)
+        end
     end
     
     
-    if not(noRes) %this only need to happen if a resonance f was found
+    if not(noRes) || cnr %this only need to happen if a resonance f was found
         % EXTRA INCREASE
         % f should be increased a little further after the resonance sinse we
         % to got slighty past the resonance frequency and not stop in the
         % middle of our resonance. This could be automate by looking at the
         % derivative again but i will not do this for now
-        f_temp=@(t) f(tc+t);
-        Rho_0=reshape(rho_inc(:,end), s_WF, s_WF);
-        [rho_temp,time_temp]=Solve_drhodt(H1,sig,J,f_temp,gamma,Kappa,Rho_0,dT,dT*extra_steps);
-        rho_inc=[rho_inc rho_temp];
-        time_inc=[time_inc time_inc(end)+time_temp];
-        % UPDATE tc
-        tc=tc+dT*extra_steps;
+        if not(noRes)
+            f_temp=@(t) f(tc+t);
+            Rho_0=reshape(rho_inc(:,end), s_WF, s_WF);
+            [rho_temp,time_temp]=Solve_drhodt(H1,sig,J,f_temp,gamma,Kappa,Rho_0,dT,dT*extra_steps,odemethod);
+            rho_inc=[rho_inc rho_temp];
+            time_inc=[time_inc time_inc(end)+time_temp];
+            % UPDATE tc
+            tc=tc+dT*extra_steps;
+            if dispt
+                disp(tc)
+            end
+        end
         % SAVE ALL F VALUES
         f_inc=time_inc;
         for i=1:length(time_inc)
@@ -70,13 +85,14 @@ function [rho,time,v_f,dS]=find_bistab(H1,sig,J,gamma,Kappa,Rho_0,dT,rate,fmin,f
         time{1}=time_inc;
         v_f{1}=f_inc;
         %% WAIT
+        disp('waiting has started')
         tw=ceil(twait/dT)*dT;
         %construct new Rho_0
         Rho_0=reshape(rho_inc(:,end), s_WF, s_WF);
         %construct f wait
         f=@(t) t_fmax_inc*rate;
         %solve drhodt
-        [rho_wait,time_wait]=Solve_drhodt(H1,sig,J,f,gamma,Kappa,Rho_0,dT,tw);
+        [rho_wait,time_wait]=Solve_drhodt(H1,sig,J,f,gamma,Kappa,Rho_0,dT,tw,odemethod);
         f_wait=time_wait;
         for i=1:length(time_wait)
             f_wait(i)=f(time_wait(i));
@@ -87,13 +103,14 @@ function [rho,time,v_f,dS]=find_bistab(H1,sig,J,gamma,Kappa,Rho_0,dT,rate,fmin,f
         time{2}=time_wait;
         v_f{2}=f_wait;
         %% DECREASE f
+        disp('decrease has started')
         te=ceil(t_fmax_inc/dT)*dT;
         %construct new Rho_0
         Rho_0=reshape(rho_wait(:,end), s_WF, s_WF);
         %construct f dec
         f=@(t) laser(t_fmax_inc+tw+t,rate,t_fmax_inc,tw,rate);
         %solve drhodt
-        [rho_dec,time_dec]=Solve_drhodt(H1,sig,J,f,gamma,Kappa,Rho_0,dT,te);
+        [rho_dec,time_dec]=Solve_drhodt(H1,sig,J,f,gamma,Kappa,Rho_0,dT,te,odemethod);
         f_dec=time_dec;
         for i=1:length(time_dec)
             f_dec(i)=f(time_dec(i));
