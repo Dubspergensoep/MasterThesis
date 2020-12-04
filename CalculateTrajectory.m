@@ -67,6 +67,7 @@ function [ time, Ct] = CalculateTrajectory(gamma, Kappa, J, f, w, epsilon, g, mu
                     NormC(Jump( transpose(Cin(end,:)), clustconfig, sig, i_jump ), NC);                 %Update wave function with jump and normalize.
                 t_left = t_left - t_s(end);                                                             %Time left untill next dt step.
                 e1 = rand;                                                                              %Pick a new random number to determine jump time.
+                ct=ct+t_s(end);                                                                         %Update current time for next loop
             end
         end
         
