@@ -22,11 +22,20 @@ function [rho,timecell,fcell,dS]=SSP(mu,g,J,N_max,dT,rate,fmin,fmax,twait,resste
     H1=H_MF_simple1(sig,omega,mu,eps,g);
     
     % Savename
-    filename=[saveloc 'SSP_mu' num2str(mu) '_g' num2str(g) '_J' num2str(J)...
+    if N_max==5
+        filename=[saveloc 'SSP_mu' num2str(mu) '_g' num2str(g) '_J' num2str(J)...
         '_fmin' num2str(fmin) '_fmax'  num2str(fmax) '_rate' ...
         num2str(rate) '_twait' num2str(twait) '_' num2str(dT) '_resstep' num2str(resstep) ...
         '_extra_steps' num2str(extra_steps) '_method' method.str ...
         '_' num2str(method.threshold) '_' num2str(method.abs_threshold) '.mat'];
+    else
+         filename=[saveloc 'SSP_mu' num2str(mu) '_g' num2str(g) '_J' num2str(J)...
+             '_N_max' num2str(N_max) ...
+        '_fmin' num2str(fmin) '_fmax'  num2str(fmax) '_rate' ...
+        num2str(rate) '_twait' num2str(twait) '_' num2str(dT) '_resstep' num2str(resstep) ...
+        '_extra_steps' num2str(extra_steps) '_method' method.str ...
+        '_' num2str(method.threshold) '_' num2str(method.abs_threshold) '.mat'];
+    end
     %%
     dS=zeros(1,2);  %dS(1) = surface in <n(f)> plot
                     %dS(2) = surface in <a(f)> plot
@@ -71,18 +80,18 @@ function [rho,timecell,fcell,dS]=SSP(mu,g,J,N_max,dT,rate,fmin,fmax,twait,resste
         plot(timecell{3},fcell{3}.^2,'color',[0, 0.4470, 0.7410],'LineWidth',1.2)       %color blue
         xlabel('t');ylabel('f^2');
         subplot(3,1,2)
-        plot(timecell{1},v_n_inc.^2,'color',[0.6350, 0.0780, 0.1840],'LineWidth',1.2)  %color dark red
+        plot(timecell{1},v_n_inc,'color',[0.6350, 0.0780, 0.1840],'LineWidth',1.2)  %color dark red
         hold on
-        plot(timecell{2},v_n_wait.^2,'color',[0.4660, 0.6740, 0.1880],'LineWidth',1.2) %color green
+        plot(timecell{2},v_n_wait,'color',[0.4660, 0.6740, 0.1880],'LineWidth',1.2) %color green
         hold on
-        plot(timecell{3},v_n_dec.^2,'color',[0, 0.4470, 0.7410],'LineWidth',1.2)       %color blue
+        plot(timecell{3},v_n_dec,'color',[0, 0.4470, 0.7410],'LineWidth',1.2)       %color blue
         xlabel('time(s)');ylabel('|<a*a>|');%title('<a>');
         subplot(3,1,3)
-        plot(fcell{1}.^2,v_n_inc.^2,'color',[0.6350, 0.0780, 0.1840],'LineWidth',1.2)  %color dark red
+        plot(fcell{1}.^2,v_n_inc,'color',[0.6350, 0.0780, 0.1840],'LineWidth',1.2)  %color dark red
         hold on
-        plot(fcell{2}.^2,v_n_wait.^2,'color',[0.4660, 0.6740, 0.1880],'LineWidth',1.2) %color green
+        plot(fcell{2}.^2,v_n_wait,'color',[0.4660, 0.6740, 0.1880],'LineWidth',1.2) %color green
         hold on
-        plot(fcell{3}.^2,v_n_dec.^2,'color',[0, 0.4470, 0.7410],'LineWidth',1.2)       %color blue
+        plot(fcell{3}.^2,v_n_dec,'color',[0, 0.4470, 0.7410],'LineWidth',1.2)       %color blue
         xlabel('f^2');ylabel('|<a*a>|');%title('<a>');
         sgtitle(plottitle)
         end
