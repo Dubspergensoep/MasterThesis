@@ -1,4 +1,4 @@
-function [rho,timecell,fcell,dS]=SSP(mu,g,J,dT,rate,fmin,fmax,twait,resstep,extra_steps,method,vplot,saveloc,saveplot,savelocplots,odemethod,dispt)
+function [rho,timecell,fcell,dS]=SSP(mu,g,J,N_max,dT,rate,fmin,fmax,twait,resstep,extra_steps,method,vplot,saveloc,saveplot,savelocplots,odemethod,dispt)
     %Solve Save and Plot
     gamma=0.005;
     Kappa=0.005;
@@ -9,7 +9,7 @@ function [rho,timecell,fcell,dS]=SSP(mu,g,J,dT,rate,fmin,fmax,twait,resstep,extr
     % sym parameters
     fill=0;
     spin=[0;1];
-    N_max=5;
+%     N_max=5;
     s_WF=2*(N_max+1);       %size wave function
     sig = GetAllOperatorsSparse(1,N_max);
     
