@@ -32,8 +32,8 @@ function dC = odeC(t, C, J, f, z, Nxc, Nyc, Nx, Ny, clustconfig, NNM, sig, A1, c
     
     
     if (Nxc == Nx) && (Nyc == Ny)%exact solution
-        A2 = cell(1);
-        A2{1} = 0;
+%         A2 = cell(1);
+        A2 = H2exact(f(ct+t),clustconfig, sig);
     else%cluster solution
         SigExp = CalcExpValues( C, clustconfig, sig );       %We calculate the expectation value of sigma_i^r, with r= x, y, z.
         %f_t=f(ct+t);                                        
@@ -44,7 +44,7 @@ function dC = odeC(t, C, J, f, z, Nxc, Nyc, Nx, Ny, clustconfig, NNM, sig, A1, c
     for j=1:N      %sum over the clusters.
         range = (Ncoeff)*(j-1)+1:(Ncoeff)*(j-1)+1+(Ncoeff-1);
         if (Nxc == Nx) && (Nyc == Ny)
-            dC(range) = A1{j}*C(range);
+            dC(range) = (A1{j}+A2{j})*C(range);
         else
             dC(range) = (A1{j}+A2{j})*C(range);
         end
