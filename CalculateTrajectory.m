@@ -25,7 +25,7 @@ function [ time, Ct] = CalculateTrajectory(gamma, Kappa, J, f, w, epsilon, g, mu
     N = Nx*Ny;                                                                                          %number of sites in lattice
     Nc = Nxc*Nyc;                                                                                       %number of sites in cluster
     NC = N/Nc;                                                                                          %number of clusters in lattice
-    N_coeff = 2*(Nmax+1)^Nc;                                                                            %number of coefficients in (single) cluster wave function
+    N_coeff = (2*(Nmax+1))^Nc;                                                                          %number of coefficients in (single) cluster wave function
      
     if Nxc == 1 && Nx ==1
         [~, ~, out] = CalcClusterNeighbours1D( Nxc, Nyc, Nx, Ny );
@@ -36,7 +36,7 @@ function [ time, Ct] = CalculateTrajectory(gamma, Kappa, J, f, w, epsilon, g, mu
     clustconfig = ClusterConfiguration(Nxc, Nyc, Nx, Ny);                                               %matrix where the row index represents the cluster and contains the indices of the sites in that respective cluster.
     sig = GetAllOperatorsSparse(Nc, Nmax);                                                              %calculate all the operators (sparse).
     NNM = NeirestNeighbourMatrix(out);                                                                  %Connection matrix, each row is a site on the lattice and the columns with a 1 are the neirest neighbours outside the cluster.
-    A1 = H1(gamma, Kappa, J, 0, w, epsilon, g, mu, z, Nxc, Nyc, Nx, Ny, sig );                                               %Time independt part of the Hamiltonian
+    A1 = H1(gamma, Kappa, J, 0, w, epsilon, g, mu, z, Nxc, Nyc, Nx, Ny, sig );                          %Time independt part of the Hamiltonian
     Tnorm = kron(eye(NC),ones(1,N_coeff));                                                              %Matrix to help calculate the norm of a product wave function.
     
     %Calculate the input wave function:

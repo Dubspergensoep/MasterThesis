@@ -15,11 +15,11 @@ function psi = GetFockWf(sig, Nsites, fill, spin)
     Ns = size(sig, 1);                      %number of  sites in cluster
     Nc = Nsites/Ns;                         %number of clusters in lattice
     fill = round(fill);                     %make sure it's a rounded number
-    snos= size(sig{1,1},1)/2;                   %size no spin wave function
+    snos= size(sig{1,1},1)/2;               %size no spin wave function
 
     %construct the single cluster wave function:
     wfc = zeros(snos,1);
-    wfc(1) = 1;          %This was we start in spin down
+    wfc(1) = 1;          %start at fill=0
     wfc=kron(spin,wfc);
     
     if fill > 0
