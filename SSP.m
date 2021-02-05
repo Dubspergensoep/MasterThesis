@@ -52,7 +52,7 @@ function [rho,timecell,fcell,dS]=SSP(mu,g,J,N_max,dT,rate,fmin,fmax,twait,resste
     v_n_dec=expectation_val(length(timecell{3}),rho{3},sig{1,3});
     flip_fdec=flip(fcell{3});
     flip_vndec=flip(v_n_dec);
-    dS(1)=trapz(flip_fdec.^2,flip_vndec.^2)-trapz(fcell{1}.^2,v_n_inc.^2);
+    dS(1)=trapz(flip_fdec.^2,flip_vndec)-trapz(fcell{1}.^2,v_n_inc);
     %% Plots
     savenameplot=[savelocplots 'SSP_plot_mu' num2str(mu) '_g' num2str(g) '_J' num2str(J)...
         '_fmin' num2str(fmin) '_fmax'  num2str(fmax) '_rate' ...
