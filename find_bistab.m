@@ -163,6 +163,8 @@ function res=checkRes(v_ea,method,dT)
         else
             res=false;
         end
+    elseif strcmp(method.str,'no_res')
+        res=false;
     else
         %calculate derivatie of v_ea
         deadT=gradient(v_ea)/dT;
