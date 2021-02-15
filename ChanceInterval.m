@@ -1,4 +1,4 @@
-function P = ChanceInterval( cin, clustconfig, sig, T )
+function P = ChanceInterval( cin, clustconfig, c_ops, d_c_ops, T )
 %-------------------------------------------------------------------------%
 %   Calculates the chance intervals of the sites to make a jump.
 %Parameters:
@@ -8,19 +8,23 @@ function P = ChanceInterval( cin, clustconfig, sig, T )
 %   T               Matrix to help calculate the norm of a product wave function.
 %-------------------------------------------------------------------------%
     
-    n = numel(clustconfig);
+    n = 2*numel(clustconfig);
     J = zeros(n,1);
     J2 = J;
     for i = 1:n
-        J(i) = Norm(Jump(cin, clustconfig, sig, i), T);
+        d_c_ops_i = ceil(i/numel(clustconfig));
+        J(i) = d_c_ops(d_c_ops_i)*Norm(Jump(cin, clustconfig, c_ops, i), T);
         J2(i) = sum(J(1:i));
     end
+    
+    
+    
 %     for i = 1:n
 %         J(i) = sig{i,2}*Norm(Jump(cin, clustconfig, sig, i), T);
 %         J2(i) = sum(J(1:i));
 %     end
     P = J2/sum(J);
-    
+    disp(P) 
     
     %Give possible warning and errors:
     if (abs(P(end) - 1) > 1e-3)

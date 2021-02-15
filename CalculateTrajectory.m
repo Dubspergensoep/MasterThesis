@@ -36,12 +36,22 @@ function [ time, Ct] = CalculateTrajectory(gamma, Kappa, J, f, w, epsilon, g, mu
     clustconfig = ClusterConfiguration(Nxc, Nyc, Nx, Ny);                                               %matrix where the row index represents the cluster and contains the indices of the sites in that respective cluster.
     sig = GetAllOperatorsSparse(Nc, Nmax);                                                              %calculate all the operators (sparse).
     NNM = NeirestNeighbourMatrix(out);                                                                  %Connection matrix, each row is a site on the lattice and the columns with a 1 are the neirest neighbours outside the cluster.
-    A1 = H1(gamma, Kappa, J, 0, w, epsilon, g, mu, z, Nxc, Nyc, Nx, Ny, sig );                          %Time independt part of the Hamiltonian
+    A1 = H1(gamma, Kappa, J, f(0), w, epsilon, g, mu, z, Nxc, Nyc, Nx, Ny, sig );                          %Time independt part of the Hamiltonian
     Tnorm = kron(eye(NC),ones(1,N_coeff));                                                              %Matrix to help calculate the norm of a product wave function.
     
     %Calculate the input wave function:
     Cin = GetFockWf(sig, N, fill, spin);
+    
+    %define the collapse operators:
+    c_ops = cell(2*Nc,1);
+    d_c_ops = [gamma*ones(1,Nc) Kappa*ones(1,Nc)];
 
+    for i = 1:Nc
+        c_ops{i} = sig{i,2};
+    end
+    for i = Nc+1:2*Nc
+        c_ops{i} = sig{Mod(i,Nc,1),6};
+    end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %Save the wave function:
@@ -49,7 +59,7 @@ function [ time, Ct] = CalculateTrajectory(gamma, Kappa, J, f, w, epsilon, g, mu
     
     %Continue time evolution of the trajectory
     for i = 1:floor(T/dt)
-        disp(i)
+%         disp(i)
         t_left = dt;                                                                                    %Time left untill next dt
         check = true;                                                                                   %Check variable to determine if timestep dt endend (Check = false).
         e1 = rand;                                                                                      %Random variable to determine jump time.
@@ -62,9 +72,9 @@ function [ time, Ct] = CalculateTrajectory(gamma, Kappa, J, f, w, epsilon, g, mu
                 C(size(C,1)+1,:) = transpose(Cin);                                                      %Save dt value.
                 check = false;                                                                          %Check becomes false to go to the next time step.
             else                                                                                        %JUMP occurs on time t_j = t_s(end).
-                i_jump = GetSite(ChanceInterval(transpose(Cin(end,:)), clustconfig, sig, Tnorm), rand); %Determine the site that jumps using their probability distribution.
-                Cin = Jump(transpose(Cin(end,:)), clustconfig, sig, i_jump)./...
-                    NormC(Jump( transpose(Cin(end,:)), clustconfig, sig, i_jump ), NC);                 %Update wave function with jump and normalize.
+                i_jump = GetSite(ChanceInterval(transpose(Cin(end,:)), clustconfig, c_ops, d_c_ops, Tnorm), rand); %Determine the site that jumps using their probability distribution.
+                Cin = Jump(transpose(Cin(end,:)), clustconfig, c_ops, i_jump)./...
+                    NormC(Jump( transpose(Cin(end,:)), clustconfig, c_ops, i_jump ), NC);                 %Update wave function with jump and normalize.
                 t_left = t_left - t_s(end);                                                             %Time left untill next dt step.
                 e1 = rand;                                                                              %Pick a new random number to determine jump time.
                 ct=ct+t_s(end);                                                                         %Update current time for next loop
